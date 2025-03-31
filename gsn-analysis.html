@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GSN 數據分析工具</title>
+    <link rel="stylesheet" href="static/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>GSN 數據分析工具</h1>
+            <p>上傳 Excel 檔案，選擇日期，查看分析結果和視覺化圖表</p>
+        </header>
+
+        <main>
+            <section class="upload-section">
+                <h2>上傳 Excel 檔案</h2>
+                <div class="upload-area" id="dropArea">
+                    <input type="file" id="fileInput" accept=".xlsx, .xls" hidden>
+                    <div class="upload-content">
+                        <img src="static/img/upload.svg" alt="上傳圖示">
+                        <p>拖放檔案到此處或</p>
+                        <button id="browseBtn" class="btn primary-btn">選擇檔案</button>
+                    </div>
+                </div>
+                <p id="fileInfo" class="file-info"></p>
+            </section>
+
+            <section class="date-section" id="dateSection" style="display: none;">
+                <h2>選擇日期</h2>
+                <div class="select-container">
+                    <select id="dateSelect" class="date-select">
+                        <option value="" disabled selected>-- 請選擇日期 --</option>
+                    </select>
+                    <button id="analyzeBtn" class="btn primary-btn">分析數據</button>
+                </div>
+            </section>
+
+            <section class="results-section" id="resultsSection" style="display: none;">
+                <h2>分析結果</h2>
+                <div class="stats-container">
+                    <div class="stat-card">
+                        <h3>最大值</h3>
+                        <p id="maxValue">-- Mbps</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>最小值</h3>
+                        <p id="minValue">-- Mbps</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>平均值</h3>
+                        <p id="avgValue">-- Mbps</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>最大值時間</h3>
+                        <p id="maxTime">--</p>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="trafficChart"></canvas>
+                </div>
+
+                <div class="export-container">
+                    <button id="exportBtn" class="btn secondary-btn">導出報告</button>
+                </div>
+            </section>
+        </main>
+
+        <div id="loadingOverlay" class="loading-overlay">
+            <div class="spinner"></div>
+            <p>處理中...</p>
+        </div>
+
+        <div id="messageOverlay" class="message-overlay">
+            <div class="message-box">
+                <p id="messageText"></p>
+                <button id="messageCloseBtn" class="btn primary-btn">確定</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 GSN 數據分析工具</p>
+    </footer>
+
+    <script src="static/js/main.js"></script>
+</body>
+</html>
