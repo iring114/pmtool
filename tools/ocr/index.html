@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OCR 文字辨識工具</title>
+    <link rel="stylesheet" href="../../static/css/style.css">
+    <link rel="stylesheet" href="./css/textarea-styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav>
+        <div class="container">
+            <div style="color: white; font-weight: bold; font-size: 18px;">OCR 文字辨識工具</div>
+            <a href="../../index.html">
+                <span style="margin-right: 5px;">&#8592;</span> 返回首頁
+            </a>
+        </div>
+    </nav>
+    <div class="container">
+        <header>
+            <h1>OCR 文字辨識工具</h1>
+            <p>上傳圖片，使用Gemini API進行文字辨識與處理</p>
+        </header>
+
+        <main>
+            <section class="upload-section">
+                <h2>上傳圖片</h2>
+                <div class="upload-area" id="upload-area">
+                    <input type="file" id="file-input" accept="image/*" hidden>
+                    <div class="upload-content">
+                        <i class="fas fa-cloud-upload-alt fa-3x"></i>
+                        <p>拖放圖片到此處或</p>
+                        <button id="browseBtn" class="btn primary-btn"><i class="fas fa-folder-open"></i> 選擇圖片</button>
+                    </div>
+                </div>
+                <div class="preview-container" id="preview-container" style="display: none;">
+                    <img id="preview-image" src="" alt="預覽圖片">
+                    <div class="preview-actions">
+                        <button id="change-image-btn" class="btn secondary-btn"><i class="fas fa-sync-alt"></i> 更換圖片</button>
+                        <button id="ocr-btn" class="btn primary-btn"><i class="fas fa-search"></i> 開始辨識</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="api-key-section" id="api-key-section">
+                <h2>Gemini API設置</h2>
+                <div class="api-key-container">
+                    <input type="text" id="api-key-input" placeholder="請輸入您的Gemini API密鑰" class="form-input" />
+                    <button id="save-api-key-btn" class="btn primary-btn"><i class="fas fa-save"></i> 儲存</button>
+                </div>
+                <p class="api-key-note">注意：API密鑰將保存在您的瀏覽器本地存儲中，不會上傳到任何伺服器。</p>
+            </section>
+
+            <section class="results-section" id="result-section" style="display: none;">
+                <h2>辨識結果</h2>
+                <div class="result-container">
+                    <textarea id="result-text" placeholder="辨識結果將顯示在這裡..." class="form-textarea"></textarea>
+                    <div class="result-actions">
+                        <button id="copy-btn" class="btn primary-btn">
+                            <i class="fas fa-copy"></i> 複製文字
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="ai-interaction-section" id="ai-interaction-section" style="display: none;">
+                <h2>AI互動處理</h2>
+                <p class="section-description">您可以在這裡輸入指令，讓AI幫您調整辨識結果或轉換格式</p>
+                <div class="ai-interaction-container">
+                    <textarea id="ai-prompt-input" placeholder="例如：「將文字整理成表格格式」、「幫我修正錯別字」、「將內容翻譯成英文」..." class="form-textarea"></textarea>
+                    <div class="ai-interaction-actions">
+                        <button id="ai-process-btn" class="btn primary-btn">
+                            <i class="fas fa-robot"></i> 處理文字
+                        </button>
+                    </div>
+                </div>
+                <div class="ai-result-container" style="display: none;">
+                    <h3>處理結果</h3>
+                    <textarea id="ai-result-text" placeholder="處理結果將顯示在這裡..." class="form-textarea"></textarea>
+                    <div class="ai-result-actions">
+                        <button id="ai-copy-btn" class="btn primary-btn">
+                            <i class="fas fa-copy"></i> 複製文字
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+            <div class="spinner"></div>
+            <p>處理中...</p>
+        </div>
+
+        <div id="toast" class="toast" style="display: none;"></div>
+
+        <footer>
+            <p>&copy; 2025 OCR 文字辨識工具 | 由Gemini API提供技術支持</p>
+        </footer>
+    </div>
+
+    <script src="./js/script.js"></script>
+</body>
+</html>

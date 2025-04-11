@@ -4,15 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GSN 數據分析工具</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="./css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
 <body>
     <nav>
         <div class="container">
             <div style="color: white; font-weight: bold; font-size: 18px;">GSN 數據分析工具</div>
-            <a href="#">
-                <span style="margin-right: 5px;">🏠</span> 首頁
+            <a href="../../index.html">
+                <span style="margin-right: 5px;">&#8592;</span> 返回首頁
             </a>
         </div>
     </nav>
@@ -28,9 +29,9 @@
                 <div class="upload-area" id="dropArea">
                     <input type="file" id="fileInput" accept=".xlsx, .xls" hidden>
                     <div class="upload-content">
-                        <img src="{{ url_for('static', filename='img/upload.svg') }}" alt="上傳圖示">
+                        <img src="./img/upload.svg" alt="上傳圖示" class="upload-icon">
                         <p>拖放檔案到此處或</p>
-                        <button id="browseBtn" class="btn primary-btn">選擇檔案</button>
+                        <button id="browseBtn" class="btn primary-btn"><i class="icon">📂</i> 選擇檔案</button>
                     </div>
                 </div>
                 <p id="fileInfo" class="file-info"></p>
@@ -42,7 +43,7 @@
                     <select id="dateSelect" class="date-select">
                         <option value="" disabled selected>-- 請選擇日期 --</option>
                     </select>
-                    <button id="analyzeBtn" class="btn primary-btn">分析數據</button>
+                    <button id="analyzeBtn" class="btn primary-btn"><i class="icon">🔍</i> 分析數據</button>
                 </div>
             </section>
 
@@ -50,19 +51,19 @@
                 <h2>分析結果</h2>
                 <div class="stats-container">
                     <div class="stat-card">
-                        <h3>最大值</h3>
+                        <h3><i class="icon">📈</i> 最大值</h3>
                         <p id="maxValue">-- Mbps</p>
                     </div>
                     <div class="stat-card">
-                        <h3>最小值</h3>
+                        <h3><i class="icon">📉</i> 最小值</h3>
                         <p id="minValue">-- Mbps</p>
                     </div>
                     <div class="stat-card">
-                        <h3>平均值</h3>
+                        <h3><i class="icon">📊</i> 平均值</h3>
                         <p id="avgValue">-- Mbps</p>
                     </div>
                     <div class="stat-card">
-                        <h3>最大值時間</h3>
+                        <h3><i class="icon">🕒</i> 最大值時間</h3>
                         <p id="maxTime">--</p>
                     </div>
                 </div>
@@ -72,7 +73,7 @@
                 </div>
 
                 <div class="export-container">
-                    <button id="exportBtn" class="btn secondary-btn">導出報告</button>
+                    <button id="exportBtn" class="btn secondary-btn"><i class="icon">📊</i> 導出報告</button>
                 </div>
             </section>
         </main>
@@ -94,6 +95,6 @@
         <p>&copy; 2025 GSN 數據分析工具</p>
     </footer>
 
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="./js/main.js"></script>
 </body>
 </html>
