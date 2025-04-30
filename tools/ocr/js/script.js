@@ -973,10 +973,10 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // 添加表格內容
         tableHtml += '<tbody>';
-        // 從第二行開始（如果有標題分隔行，則從第三行開始）
-        const startRow = hasHeaderSeparator ? 2 : 1;
-        for (let i = startRow; i < tableData.length; i++) {
-            tableHtml += `<tr class="${(i - startRow) % 2 === 0 ? 'odd-row' : 'even-row'}">`;
+        // 表格內容從 tableData 的索引 1 開始 (索引 0 是表頭)
+        for (let i = 1; i < tableData.length; i++) {
+            // 根據數據行的實際索引 (i-1) 來決定奇偶行樣式
+            tableHtml += `<tr class="${(i - 1) % 2 === 0 ? 'odd-row' : 'even-row'}">`;
             tableData[i].forEach((cell, cellIndex) => {
                 // 檢查單元格是否包含數字，如果是則右對齊
                 const isNumeric = /^[\-+]?\d*\.?\d+$/.test(cell.trim());
