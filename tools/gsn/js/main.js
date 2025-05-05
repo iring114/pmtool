@@ -133,23 +133,118 @@ async function processExcelFile(file) {
                 const data = new Uint8Array(e.target.result);
                 const workbook = XLSX.read(data, {type: 'array'});
                 
-                // 獲取第一個工作表
-                const firstSheetName = workbook.SheetNames[0];
-                const worksheet = workbook.Sheets[firstSheetName];
+                // 假設第一個工作表是 "日流量"，第二個是 "周流量"
+                const dailySheetName = workbook.SheetNames[0]; // 或者根據實際名稱調整
+                const weeklySheetName = workbook.SheetNames[1]; // 或者根據實際名稱調整
+
+                if (!workbook.Sheets[dailySheetName]) {
+                    throw new Error('找不到 "日流量" 工作表 (預期在第一個)');
+                }
+                // 允許周流量工作表不存在
+                const weeklyWorksheet = workbook.Sheets[weeklySheetName]; 
+
+                const dailyWorksheet = workbook.Sheets[dailySheetName];
                 
                 // 將工作表轉換為JSON
-                const jsonData = XLSX.utils.sheet_to_json(worksheet);
-                
-                // 檢查必要的列是否存在
-                if (!jsonData.length || !jsonData[0].hasOwnProperty('time') || !jsonData[0].hasOwnProperty('out')) {
-                    throw new Error('文件格式不正確，缺少必要的列(time或out)');
+                const dailyJsonData = XLSX.utils.sheet_to_json(dailyWorksheet);
+                const weeklyJsonData = weeklyWorksheet ? XLSX.utils.sheet_to_json(weeklyWorksheet) : [];
+
+                // 檢查日流量工作表必要的列是否存在
+                if (!dailyJsonData.length || !dailyJsonData[0].hasOwnProperty('time') || !dailyJsonData[0].hasOwnProperty('out')) {
+                     // 如果周流量工作表也不存在或格式不對，則報錯
+                    if (!weeklyJsonData.length || !weeklyJsonData[0].hasOwnProperty('time') || !weeklyJsonData[0].hasOwnProperty('out')) {
+                        throw new Error('文件格式不正確，日流量和周流量工作表都缺少必要的列(time或out)或不存在');
+                    } 
+                    // 如果只有日流量格式不對，可以繼續處理周流量
+                    console.warn('日流量工作表格式不正確或為空，將僅使用周流量數據');
                 }
-                
-                // 處理數據
-                excelData = jsonData.map(row => ({
-                    time: new Date(row.time),
-                    out: parseFloat(row.out)
-                }));
+
+                // 處理並合併數據，優先使用日流量數據
+                const combinedDataMap = new Map();
+
+                // 處理周流量數據 (如果存在且格式正確)
+                if (weeklyJsonData.length > 0 && weeklyJsonData[0].hasOwnProperty('time') && weeklyJsonData[0].hasOwnProperty('out')) {
+                    weeklyJsonData.forEach(row => {
+                        // 檢查 time 和 out 是否有效
+                        if (row.time && row.out !== undefined && row.out !== null) {
+                            try {
+                                const time = new Date(row.time);
+                                // 檢查轉換後的日期是否有效
+                                if (time instanceof Date && !isNaN(time)) {
+                                    const dateStr = time.toISOString().split('T')[0]; // 使用 ISO 日期字符串作為 key
+                                    const dataPoint = { time: time, out: parseFloat(row.out) };
+                                    if (!combinedDataMap.has(dateStr)) {
+                                        combinedDataMap.set(dateStr, []);
+                                    }
+                                    combinedDataMap.get(dateStr).push(dataPoint);
+                                } else {
+                                    console.warn('周流量數據中發現無效時間格式:', row.time);
+                                }
+                            } catch (e) {
+                                console.error('處理周流量時間時出錯:', e, '行數據:', row);
+                            }
+                        }
+                    });
+                }
+
+                // 處理日流量數據 (如果存在且格式正確)
+                const dailyDates = new Set();
+                if (dailyJsonData.length > 0 && dailyJsonData[0].hasOwnProperty('time') && dailyJsonData[0].hasOwnProperty('out')) {
+                    dailyJsonData.forEach(row => {
+                         // 檢查 time 和 out 是否有效
+                        if (row.time && row.out !== undefined && row.out !== null) {
+                            try {
+                                const time = new Date(row.time);
+                                // 檢查轉換後的日期是否有效
+                                if (time instanceof Date && !isNaN(time)) {
+                                    
+
+                                    const dateStr = time.toISOString().split('T')[0];
+                                    const dataPoint = { time: time, out: parseFloat(row.out) };
+
+                                    // 如果 Map 中還沒有這一天的數據，則初始化一個空數組
+                                    if (!combinedDataMap.has(dateStr)) {
+                                        combinedDataMap.set(dateStr, []);
+                                    }
+
+                                    // 如果這是第一次遇到這個日期的日流量數據，標記一下
+                                    if (!dailyDates.has(dateStr)) {
+                                        // 不再清空，而是準備合併。可以考慮在這裡移除與日流量時間點衝突的周流量數據
+                                        // 但更簡單的方式是，在排序後處理，或者讓用戶知曉可能存在混合數據
+                                        dailyDates.add(dateStr);
+                                        // 可選：如果需要嚴格按日流量覆蓋，可以在此處過濾掉當天所有周流量數據
+                                        // combinedDataMap.set(dateStr, []); // 如果決定完全覆蓋，則取消註釋此行
+                                    }
+
+                                    // 添加日流量數據點
+                                    combinedDataMap.get(dateStr).push(dataPoint);
+                                } else {
+                                     console.warn('日流量數據中發現無效時間格式:', row.time);
+                                }
+                            } catch (e) {
+                                console.error('處理日流量時間時出錯:', e, '行數據:', row);
+                            }
+                        }
+                    });
+                }
+
+                // 將 Map 轉換回數組
+                excelData = [];
+                combinedDataMap.forEach(dataPoints => {
+                    excelData.push(...dataPoints);
+                });
+
+                // 按時間排序
+                excelData.sort((a, b) => a.time - b.time);
+
+                // 可選：排序後再次處理，確保同一時間點只有一個數據（日優先）
+                // 這一步比較複雜，暫時省略，目前的邏輯是日數據和周數據可能在同一天共存
+                // 如果需要嚴格去重，可以在這裡實現
+
+                // 如果排序後 excelData 為空，則表示沒有有效數據
+                if (excelData.length === 0) {
+                    throw new Error('未能從文件中讀取到有效的時間和流量數據');
+                }
                 
                 // 獲取唯一日期列表
                 const dates = getUniqueDates(excelData);
@@ -198,15 +293,20 @@ function getUniqueDates(data) {
     const dateSet = new Set();
     
     data.forEach(item => {
-        // 使用本地日期格式而非ISO格式，避免時區問題
-        const year = item.time.getFullYear();
-        const month = String(item.time.getMonth() + 1).padStart(2, '0');
-        const day = String(item.time.getDate()).padStart(2, '0');
-        const dateStr = `${year}-${month}-${day}`;
-        
-        if (!dateSet.has(dateStr)) {
-            dateSet.add(dateStr);
-            uniqueDates.push(dateStr);
+        // 確保 item.time 是有效的 Date 對象
+        if (item && item.time instanceof Date && !isNaN(item.time)) {
+            // 使用本地日期格式而非ISO格式，避免時區問題
+            const year = item.time.getFullYear();
+            const month = String(item.time.getMonth() + 1).padStart(2, '0');
+            const day = String(item.time.getDate()).padStart(2, '0');
+            const dateStr = `${year}-${month}-${day}`;
+            
+            if (!dateSet.has(dateStr)) {
+                dateSet.add(dateStr);
+                uniqueDates.push(dateStr);
+            }
+        } else {
+            console.warn('在 getUniqueDates 中發現無效的時間數據:', item);
         }
     });
     
@@ -241,12 +341,21 @@ function analyzeData() {
     try {
         // 根據選擇的日期過濾數據
         const filteredData = excelData.filter(item => {
-            // 使用本地日期格式而非ISO格式，與getUniqueDates函數保持一致
-            const year = item.time.getFullYear();
-            const month = String(item.time.getMonth() + 1).padStart(2, '0');
-            const day = String(item.time.getDate()).padStart(2, '0');
-            const dateStr = `${year}-${month}-${day}`;
-            return dateStr === selectedDate;
+            // 確保 item.time 是有效的 Date 對象
+            if (item && item.time instanceof Date && !isNaN(item.time)) {
+                // 使用本地日期格式而非ISO格式，與getUniqueDates函數保持一致
+                const year = item.time.getFullYear();
+                const month = String(item.time.getMonth() + 1).padStart(2, '0');
+                const day = String(item.time.getDate()).padStart(2, '0');
+                const dateStr = `${year}-${month}-${day}`;
+                return dateStr === selectedDate;
+            } else {
+                // 在 analyzeData 和 exportReport 中都會用到此過濾邏輯
+                // 使用 console.trace() 可以幫助確定調用來源，但會增加控制台輸出
+                // console.trace('過濾掉無效數據:', item); 
+                console.warn('過濾掉無效或格式不正確的時間數據:', item);
+                return false; // 過濾掉無效數據
+            }
         });
         
         // 檢查是否有數據
@@ -498,12 +607,21 @@ function exportReport() {
     try {
         // 根據選擇的日期過濾數據
         const filteredData = excelData.filter(item => {
-            // 使用本地日期格式而非ISO格式，與getUniqueDates函數保持一致
-            const year = item.time.getFullYear();
-            const month = String(item.time.getMonth() + 1).padStart(2, '0');
-            const day = String(item.time.getDate()).padStart(2, '0');
-            const dateStr = `${year}-${month}-${day}`;
-            return dateStr === selectedDate;
+            // 確保 item.time 是有效的 Date 對象
+            if (item && item.time instanceof Date && !isNaN(item.time)) {
+                // 使用本地日期格式而非ISO格式，與getUniqueDates函數保持一致
+                const year = item.time.getFullYear();
+                const month = String(item.time.getMonth() + 1).padStart(2, '0');
+                const day = String(item.time.getDate()).padStart(2, '0');
+                const dateStr = `${year}-${month}-${day}`;
+                return dateStr === selectedDate;
+            } else {
+                // 在 analyzeData 和 exportReport 中都會用到此過濾邏輯
+                // 使用 console.trace() 可以幫助確定調用來源，但會增加控制台輸出
+                // console.trace('過濾掉無效數據:', item); 
+                console.warn('過濾掉無效或格式不正確的時間數據:', item);
+                return false; // 過濾掉無效數據
+            }
         });
         
         // 檢查是否有數據
