@@ -30,27 +30,29 @@
 ## 目錄結構
 
 ```
-gsn_convert_tool/
+pmtool/
+├── README.md             # 專案說明文件
 ├── index.html            # 主頁面
+├── requirements.txt      # Python 依賴 (如果有的話)
 ├── static/               # 共用靜態資源
-│   ├── css/              # CSS樣式
+│   ├── css/
 │   │   └── style.css     # 主要樣式表
-│   ├── js/               # JavaScript
-│   │   └── main.js       # 主要JS邏輯
-│   └── img/              # 圖片資源
-│       └── upload.svg    # 上傳圖標
-├── tools/                # 工具目錄
-│   ├── gsn/              # GSN數據分析工具
-│   │   ├── index.html    # GSN工具頁面
-│   │   ├── css/          # GSN工具樣式
-│   │   ├── js/           # GSN工具腳本
-│   │   └── img/          # GSN工具圖片
-│   └── ocr/              # OCR文字辨識工具
-│       ├── index.html    # OCR工具頁面
-│       ├── css/          # OCR工具樣式
-│       └── js/           # OCR工具腳本
-├── reports/              # 生成的報告存放目錄（自動創建）
-└── uploads/              # 上傳的檔案暫存目錄（自動創建）
+│   ├── img/
+│   │   └── upload.svg    # 上傳圖標
+│   └── js/
+│       └── main.js       # 主要JS邏輯
+├── templates/            # HTML 模板 (如果使用後端框架)
+│   └── index.html
+└── tools/                # 工具目錄
+    ├── gsn/              # GSN數據分析工具
+    │   ├── index.html    # GSN工具頁面
+    │   ├── css/          # GSN工具樣式
+    │   ├── js/           # GSN工具腳本
+    │   └── img/          # GSN工具圖片
+    └── ocr/              # OCR文字辨識工具
+        ├── index.html    # OCR工具頁面
+        ├── css/          # OCR工具樣式
+        └── js/           # OCR工具腳本
 ```
 
 ## 使用方法
