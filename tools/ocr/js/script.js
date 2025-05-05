@@ -84,7 +84,8 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 點擊瀏覽按鈕觸發文件選擇
     if (browseBtn) {
-        browseBtn.addEventListener('click', function() {
+        browseBtn.addEventListener('click', function(e) {
+            e.stopPropagation(); // 防止事件冒泡到 uploadArea
             fileInput.click();
         });
     }
