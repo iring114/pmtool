@@ -1,121 +1,204 @@
-# 專案工具網站
+# PM Tools | 專案工具網站
 
-這是一個靜態網頁工具集合，提供GSN數據分析和OCR文字辨識功能，可直接在瀏覽器中運行，無需後端服務器。
+**English** | [繁體中文](./README.zh-TW.md)
 
-## 可用工具
+A creative, artistic web-based toolkit featuring a **Liquid Abstract** design theme with real-time GLSL fluid shaders and brutalist editorial typography.
 
-### GSN 數據分析工具
+![Version](https://img.shields.io/badge/version-2.0-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
 
-- 上傳Excel檔案（支持.xlsx和.xls格式）
-- 從檔案中提取可用日期供用戶選擇
-- 顯示所選日期的數據分析（最大值、最小值、平均值、最大值發生時間）
-- 使用Chart.js顯示數據的視覺化圖表（每日流量變化）
-- 導出分析報告（Excel格式）
+## 🎨 Design Philosophy
 
-### OCR 文字辨識工具
+This project breaks away from traditional UI frameworks to deliver a unique, immersive experience:
 
-- 上傳圖片並顯示預覽
-- 使用Gemini API進行OCR辨識
-- 顯示辨識結果並允許編輯
-- 提供複製文字功能
-- 根據用戶指令，使用Gemini API對OCR結果進行進一步處理（例如：摘要、翻譯、格式化為表格）
-- 對於表格格式的AI處理結果，提供可搜索和排序的HTML表格顯示
-- 錯誤處理和用戶提示
+- **Liquid Abstract Background**: Real-time GLSL shader creating morphing fluid colors
+- **Editorial Typography**: Using Syne (bold artistic headers) and Space Grotesk (modern body)
+- **Brutalist Layout**: Asymmetrical, staggered card design with bold borders
+- **Minimalist Interactions**: Clean, underlined buttons and borderless inputs
 
-## 技術架構
+## ✨ Features
 
-- **前端**：HTML, CSS, JavaScript
-- **數據處理**：SheetJS (xlsx)
-- **圖表繪製**：Chart.js
-- **OCR服務**：Gemini API
+### 🏠 Home Page
+- Full-viewport liquid fluid shader background (Three.js)
+- Giant outline typography with hover effects
+- Staggered tool cards with 3D transform effects
 
-## 目錄結構
+### 📊 GSN Data Analysis Tool
+Analyze GSN network data from Excel files with interactive charts.
+
+**Features:**
+- Excel file upload (.xlsx, .xls)
+- Date-based data filtering
+- Statistical analysis (max, min, average)
+- Interactive Chart.js visualizations
+- Export analysis reports
+
+### 🔍 OCR Text Recognition Tool
+Extract and process text from images using Google's Gemini AI.
+
+**Features:**
+- Image upload with drag-and-drop
+- Gemini 2.5 Flash API integration
+- AI-powered text extraction
+- Interactive text processing (formatting, translation, error correction)
+- Copy-to-clipboard functionality
+
+## 📁 Project Structure
 
 ```
-pmtool/
-├── README.md             # 專案說明文件
-├── index.html            # 主頁面
-├── requirements.txt      # Python 依賴 (如果有的話)
-├── static/               # 共用靜態資源
+Pmtool/
+├── index.html                    # Home page
+├── README.md                     # This file
+├── requirements.txt              # Python dependencies (if applicable)
+│
+├── static/                       # Global assets
 │   ├── css/
-│   │   └── style.css     # 主要樣式表
+│   │   └── style.css            # Main stylesheet (Liquid Abstract theme)
 │   ├── img/
-│   │   └── upload.svg    # 上傳圖標
+│   │   └── upload.svg           # Upload icon
 │   └── js/
-│       └── main.js       # 主要JS邏輯
-├── templates/            # HTML 模板 (如果使用後端框架)
-│   └── index.html
-└── tools/                # 工具目錄
-    ├── gsn/              # GSN數據分析工具
-    │   ├── index.html    # GSN工具頁面
-    │   ├── css/          # GSN工具樣式
-    │   ├── js/           # GSN工具腳本
-    │   └── img/          # GSN工具圖片
-    └── ocr/              # OCR文字辨識工具
-        ├── index.html    # OCR工具頁面
-        ├── css/          # OCR工具樣式
-        └── js/           # OCR工具腳本
+│       ├── bg-3d.js             # Three.js GLSL fluid shader
+│       └── main.js              # Shared utilities
+│
+└── tools/                        # Tool modules
+    ├── gsn/                      # GSN Analysis Tool
+    │   ├── index.html
+    │   ├── img/
+    │   │   └── upload.svg
+    │   └── js/
+    │       └── main.js          # GSN-specific logic
+    │
+    └── ocr/                      # OCR Tool
+        ├── index.html
+        ├── css/
+        │   └── textarea-styles.css  # Minimalist textarea styles
+        └── js/
+            └── script.js        # OCR & Gemini API logic
 ```
 
-## 使用方法
+## 🚀 Getting Started
 
-1. 直接在瀏覽器中打開 `index.html` 文件，或部署到網站後訪問
+### Prerequisites
+- Modern web browser (Chrome, Firefox, Edge, Safari)
+- For OCR Tool: Google Gemini API Key ([Get here](https://ai.google.dev/))
 
-2. 從主頁選擇需要使用的工具：
-   - GSN數據分析工具
-   - OCR文字辨識工具
+### Installation
 
-3. 按照各工具的界面指引操作
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/yourusername/pmtool.git
+   cd pmtool
+   ```
 
-## GSN數據分析工具使用方法
+2. **Serve locally:**
+   
+   **Option 1: Python HTTP Server**
+   ```bash
+   # Python 3
+   python -m http.server 8000
+   
+   # Python 2
+   python -m SimpleHTTPServer 8000
+   ```
+   
+   **Option 2: Node.js HTTP Server**
+   ```bash
+   npx http-server
+   ```
+   
+   **Option 3: VS Code Live Server**
+   - Install the "Live Server" extension
+   - Right-click `index.html` → "Open with Live Server"
 
-1. 點擊「選擇檔案」按鈕或拖放Excel檔案到上傳區域
-2. 從下拉菜單中選擇日期
-3. 點擊「分析數據」按鈕查看結果
-4. 點擊「導出報告」按鈕下載Excel格式的分析報告
+3. **Open in browser:**
+   ```
+   http://localhost:8000
+   ```
 
-## OCR文字辨識工具使用方法
+### OCR Tool Setup
 
-1. 點擊「選擇圖片」按鈕上傳圖片
-2. 圖片將顯示在預覽區域
-3. 輸入您的Gemini API密鑰
-4. 點擊「開始辨識」按鈕進行OCR處理
-5. 辨識結果將顯示在文字區域，可以直接編輯
-6. 點擊「複製文字」按鈕將結果複製到剪貼板
-7. （可選）在下方的「AI處理指令」輸入框中輸入您希望AI執行的操作（例如：翻譯成英文、總結內容、整理成表格）。
-8. 點擊「處理文字」按鈕。
-9. AI處理結果將顯示在下方區域。如果結果是表格，會以可互動的表格形式展示（支持搜索和排序）。
-10. 點擊對應的「複製文字」按鈕複製AI處理結果（如果是表格，則複製原始文本）。
+1. Navigate to the OCR tool
+2. Click "Gemini API設置"
+3. Enter your Gemini API key
+4. The key is saved in browser localStorage (not sent to any server)
 
-## 部署到GitHub Pages
+## 🎯 Usage
 
-1. 在GitHub上創建一個新的儲存庫
+### GSN Analysis Tool
+1. Click "使用工具" on the GSN card
+2. Upload an Excel file containing GSN data
+3. Select a date from the dropdown
+4. Click "分析數據" to view statistics and charts
+5. Optionally export the report
 
-2. 將所有文件上傳到儲存庫
+### OCR Tool
+1. Click "使用工具" on the OCR card
+2. Upload an image or drag-and-drop
+3. Click "開始辨識" to extract text
+4. Use "AI互動處理" to format, translate, or correct the text
+5. Copy results to clipboard
 
-3. 在儲存庫設置中啟用GitHub Pages：
-   - 進入儲存庫的「Settings」
-   - 找到「Pages」選項
-   - 在「Source」下選擇「main」分支
-   - 點擊「Save」
+## 🛠 Technology Stack
 
-4. 等待幾分鐘後，您的網站將在以下地址可用：
-   `https://<您的用戶名>.github.io/<儲存庫名稱>/`
+### Frontend
+- **HTML5** - Semantic markup
+- **CSS3** - Liquid Abstract theme, Brutalist design
+- **Vanilla JavaScript** - No framework dependencies
+- **Three.js** - WebGL/GLSL shader rendering
 
-## 本地開發
+### Libraries
+- [Three.js](https://threejs.org/) - 3D graphics and shaders
+- [Chart.js](https://www.chartjs.org/) - Data visualization
+- [SheetJS](https://sheetjs.com/) - Excel file parsing
+- [Font Awesome](https://fontawesome.com/) - Icons
+- [Google Fonts](https://fonts.google.com/) - Syne & Space Grotesk typography
 
-由於瀏覽器的安全限制，如果您直接在本地打開HTML文件，可能會遇到CORS問題。建議使用簡單的HTTP服務器來測試：
+### APIs
+- [Google Gemini AI](https://ai.google.dev/) - OCR and text processing
 
-```bash
-# 使用Python啟動簡單的HTTP服務器
-python -m http.server
+## 🎨 Design Tokens
 
-# 然後在瀏覽器中訪問：http://localhost:8000
+```css
+:root {
+    --text-primary: #ffffff;
+    --text-accent: #00ffcc;        /* Neon Cyan */
+    --font-heading: 'Syne', sans-serif;
+    --font-body: 'Space Grotesk', sans-serif;
+}
 ```
 
-## 注意事項
+## 🐛 Known Issues & Fixes
 
-- 所有數據處理都在瀏覽器中進行，不會上傳到任何服務器
-- GSN Excel文件必須包含 `time` 和 `out` 列
-- OCR功能需要有效的Gemini API密鑰
-- 為獲得最佳體驗，建議使用現代瀏覽器（Chrome、Firefox、Edge等）
+- ✅ **Fixed**: Cursor changed to crosshair → Reset to default
+- ✅ **Fixed**: Loading screen stuck on GSN page → Hidden by default
+
+## 📝 Development
+
+### Adding a New Tool
+
+1. Create a new directory in `tools/`
+2. Add `index.html` with the tool UI
+3. Create tool-specific JS/CSS as needed
+4. Update home page (`index.html`) with a new tool card
+5. Ensure the tool uses the global `static/css/style.css`
+
+### Customizing the Shader
+
+Edit `static/js/bg-3d.js` to modify:
+- Color palette (lines with `vec3` color definitions)
+- Animation speed (`u_time` multipliers)
+- Noise patterns (adjust `snoise` parameters)
+
+## 📄 License
+
+MIT License - feel free to use this project for your own purposes.
+
+## 🙏 Acknowledgments
+
+- Three.js community for shader examples
+- Google AI for Gemini API
+- Design inspiration from creative coding communities
+
+---
+
+**Made with ❤️ and GLSL shaders**

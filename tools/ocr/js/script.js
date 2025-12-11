@@ -1,6 +1,6 @@
 // OCR工具的主要JavaScript功能
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // 獲取DOM元素
     const fileInput = document.getElementById('file-input');
     const uploadArea = document.getElementById('upload-area');
@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const aiResultContainer = document.querySelector('.ai-result-container');
     const aiResultText = document.getElementById('ai-result-text');
     const aiCopyBtn = document.getElementById('ai-copy-btn');
-    
+
     // 設置textarea自動調整高度
     const textareas = document.querySelectorAll('textarea');
     textareas.forEach(textarea => {
@@ -32,21 +32,21 @@ document.addEventListener('DOMContentLoaded', function() {
         // 初始化高度
         setTimeout(() => autoResizeTextarea.call(textarea), 0);
     });
-    
+
     // 當前上傳的文件和API密鑰
     let currentFile = null;
     const API_KEY_STORAGE_KEY = 'gemini_api_key';
     let apiKey = localStorage.getItem(API_KEY_STORAGE_KEY) || '';
-    
+
     // 如果已有API密鑰，則填入輸入框
     if (apiKey) {
         apiKeyInput.value = apiKey;
         // 顯示已保存的提示
         showToast('已載入保存的API密鑰');
     }
-    
+
     // 保存API密鑰
-    saveApiKeyBtn.addEventListener('click', function() {
+    saveApiKeyBtn.addEventListener('click', function () {
         const newApiKey = apiKeyInput.value.trim();
         if (newApiKey) {
             localStorage.setItem(API_KEY_STORAGE_KEY, newApiKey);
@@ -56,54 +56,54 @@ document.addEventListener('DOMContentLoaded', function() {
             showToast('請輸入有效的API密鑰', true);
         }
     });
-    
+
     // 拖放功能
-    uploadArea.addEventListener('dragover', function(e) {
+    uploadArea.addEventListener('dragover', function (e) {
         e.preventDefault();
         uploadArea.classList.add('active');
     });
-    
-    uploadArea.addEventListener('dragleave', function() {
+
+    uploadArea.addEventListener('dragleave', function () {
         uploadArea.classList.remove('active');
     });
-    
-    uploadArea.addEventListener('drop', function(e) {
+
+    uploadArea.addEventListener('drop', function (e) {
         e.preventDefault();
         uploadArea.classList.remove('active');
-        
+
         if (e.dataTransfer.files.length) {
             fileInput.files = e.dataTransfer.files;
             handleFileUpload(e.dataTransfer.files[0]);
         }
     });
-    
+
     // 點擊上傳區域觸發文件選擇
-    uploadArea.addEventListener('click', function() {
+    uploadArea.addEventListener('click', function () {
         fileInput.click();
     });
-    
+
     // 點擊瀏覽按鈕觸發文件選擇
     if (browseBtn) {
-        browseBtn.addEventListener('click', function(e) {
+        browseBtn.addEventListener('click', function (e) {
             e.stopPropagation(); // 防止事件冒泡到 uploadArea
             fileInput.click();
         });
     }
-    
+
     // 文件選擇事件
-    fileInput.addEventListener('change', function() {
+    fileInput.addEventListener('change', function () {
         if (fileInput.files.length) {
             handleFileUpload(fileInput.files[0]);
         }
     });
-    
+
     // 更換圖片按鈕
-    changeImageBtn.addEventListener('click', function() {
+    changeImageBtn.addEventListener('click', function () {
         resetUI();
     });
-    
+
     // OCR按鈕
-    ocrBtn.addEventListener('click', function() {
+    ocrBtn.addEventListener('click', function () {
         if (currentFile) {
             // 檢查API密鑰
             if (!apiKey) {
@@ -116,39 +116,39 @@ document.addEventListener('DOMContentLoaded', function() {
             showToast('請先上傳圖片', true);
         }
     });
-    
+
     // 複製按鈕
-    copyBtn.addEventListener('click', function() {
+    copyBtn.addEventListener('click', function () {
         copyToClipboard(resultText);
     });
-    
+
     // AI處理按鈕
-    aiProcessBtn.addEventListener('click', function() {
+    aiProcessBtn.addEventListener('click', function () {
         if (!resultText.value.trim()) {
             showToast('請先進行OCR辨識獲取文字', true);
             return;
         }
-        
+
         if (!aiPromptInput.value.trim()) {
             showToast('請輸入處理指令', true);
             return;
         }
-        
+
         // 檢查API密鑰
         if (!apiKey) {
             showToast('請先設置Gemini API密鑰', true);
             apiKeySection.scrollIntoView({ behavior: 'smooth' });
             return;
         }
-        
+
         processAIInteraction(resultText.value, aiPromptInput.value);
     });
-    
+
     // AI結果複製按鈕
-    aiCopyBtn.addEventListener('click', function() {
+    aiCopyBtn.addEventListener('click', function () {
         copyToClipboard(aiResultText);
     });
-    
+
     // 處理文件上傳
     function handleFileUpload(file) {
         // 檢查文件類型
@@ -157,30 +157,30 @@ document.addEventListener('DOMContentLoaded', function() {
             showToast('不支持的文件類型，請上傳圖片文件', true);
             return;
         }
-        
+
         // 檢查文件大小 (限制為10MB)
         if (file.size > 10 * 1024 * 1024) {
             showToast('文件太大，請上傳小於10MB的圖片', true);
             return;
         }
-        
+
         // 顯示預覽
         const reader = new FileReader();
-        reader.onload = function(e) {
+        reader.onload = function (e) {
             previewImage.src = e.target.result;
             uploadArea.style.display = 'none';
             previewContainer.style.display = 'block';
             currentFile = file;
-            
+
             // 隱藏結果區域（如果之前顯示過）
             resultSection.style.display = 'none';
             resultText.value = '';
-            
+
             showToast('圖片已準備就緒');
         };
         reader.readAsDataURL(file);
     }
-    
+
     // 處理OCR
     async function processOCR(file) {
         // 檢查API密鑰
@@ -188,22 +188,22 @@ document.addEventListener('DOMContentLoaded', function() {
             showToast('請先設置Gemini API密鑰', true);
             return;
         }
-        
+
         // 顯示載入動畫
         loadingOverlay.style.display = 'flex';
-        
+
         try {
             // 將文件轉換為base64
             const base64Image = await fileToBase64(file);
             const base64Data = base64Image.split(',')[1]; // 移除data URL前綴
-            
+
             // 準備Gemini API請求
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-            
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+
             const requestData = {
                 contents: [{
                     parts: [
-                        {text: "請從這張圖片中提取所有可見的文字。只返回提取的文字內容，不要添加任何解釋或額外信息。"}, 
+                        { text: "請從這張圖片中提取所有可見的文字。只返回提取的文字內容，不要添加任何解釋或額外信息。" },
                         {
                             inline_data: {
                                 mime_type: file.type,
@@ -213,7 +213,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     ]
                 }]
             };
-            
+
             // 發送請求到Gemini API
             const response = await fetch(apiUrl, {
                 method: 'POST',
@@ -222,28 +222,28 @@ document.addEventListener('DOMContentLoaded', function() {
                 },
                 body: JSON.stringify(requestData)
             });
-            
+
             const result = await response.json();
-            
+
             // 隱藏載入動畫
             loadingOverlay.style.display = 'none';
-            
+
             // 解析API響應
             if (response.ok && result.candidates && result.candidates.length > 0) {
                 const text = result.candidates[0].content.parts[0].text;
-                
+
                 // 顯示結果
                 resultText.value = text;
                 resultSection.style.display = 'block';
-                
+
                 // 顯示AI互動區域
                 aiInteractionSection.style.display = 'block';
                 aiPromptInput.value = '';
                 aiResultContainer.style.display = 'none';
-                
+
                 // 滾動到結果區域
                 resultSection.scrollIntoView({ behavior: 'smooth' });
-                
+
                 showToast('OCR處理完成');
             } else {
                 const errorMessage = result.error ? result.error.message : '無法從API響應中提取文字';
@@ -257,7 +257,7 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('OCR錯誤:', error);
         }
     }
-    
+
     // 將文件轉換為base64
     function fileToBase64(file) {
         return new Promise((resolve, reject) => {
@@ -267,12 +267,12 @@ document.addEventListener('DOMContentLoaded', function() {
             reader.readAsDataURL(file);
         });
     }
-    
+
     // 複製文字到剪貼板
     function copyToClipboard(textElement) {
         textElement.select();
         textElement.setSelectionRange(0, 99999); // 對於移動設備
-        
+
         try {
             const successful = document.execCommand('copy');
             if (successful) {
@@ -291,7 +291,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     }
-    
+
     // 顯示提示訊息
     function showToast(message, isError = false) {
         toast.textContent = message;
@@ -299,36 +299,36 @@ document.addEventListener('DOMContentLoaded', function() {
         toast.style.display = 'block';
         toast.style.opacity = '1';
         toast.style.visibility = 'visible';
-        
+
         // 3秒後隱藏
         setTimeout(() => {
             toast.style.display = 'none';
         }, 3000);
     }
-    
+
     // 自動調整textarea高度的函數
     function autoResizeTextarea() {
         this.style.height = 'auto';
         this.style.height = (this.scrollHeight) + 'px';
     }
-    
+
     // 處理AI互動
     async function processAIInteraction(text, prompt) {
         // 顯示載入動畫
         loadingOverlay.style.display = 'flex';
-        
+
         try {
             // 準備Gemini API請求
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-            
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+
             const requestData = {
                 contents: [{
                     parts: [
-                        {text: `以下是OCR辨識出的文字內容：\n\n${text}\n\n用戶指令：${prompt}\n\n請根據用戶指令處理上述文字，只返回處理後的結果，不要添加任何解釋或額外信息。如果結果是表格數據，請使用清晰的表格格式（使用 | 作為列分隔符），確保表格格式整齊，每列對齊，並包含表頭行。如果識別到表格但格式不清晰，請嘗試重新整理成標準表格格式。`}
+                        { text: `以下是OCR辨識出的文字內容：\n\n${text}\n\n用戶指令：${prompt}\n\n請根據用戶指令處理上述文字，只返回處理後的結果，不要添加任何解釋或額外信息。如果結果是表格數據，請使用清晰的表格格式（使用 | 作為列分隔符），確保表格格式整齊，每列對齊，並包含表頭行。如果識別到表格但格式不清晰，請嘗試重新整理成標準表格格式。` }
                     ]
                 }]
             };
-            
+
             // 發送請求到Gemini API
             const response = await fetch(apiUrl, {
                 method: 'POST',
@@ -337,48 +337,48 @@ document.addEventListener('DOMContentLoaded', function() {
                 },
                 body: JSON.stringify(requestData)
             });
-            
+
             const result = await response.json();
-            
+
             // 隱藏載入動畫
             loadingOverlay.style.display = 'none';
-            
+
             // 解析API響應
             if (response.ok && result.candidates && result.candidates.length > 0) {
                 const processedText = result.candidates[0].content.parts[0].text;
-                
+
                 // 移除之前可能存在的表格容器
                 const existingTableContainer = document.querySelector('.table-container');
                 if (existingTableContainer) {
                     existingTableContainer.remove();
                 }
-                
+
                 // 移除之前可能存在的隱藏textarea
                 const existingHiddenTextarea = document.querySelector('.hidden-original-text');
                 if (existingHiddenTextarea) {
                     existingHiddenTextarea.remove();
                 }
-                
+
                 // 檢查是否為表格格式的文本
                 if (isTableFormat(processedText)) {
                     // 將文本轉換為HTML表格
                     const tableHtml = convertToHtmlTable(processedText);
-                    
+
                     // 創建一個隱藏的textarea用於複製原始文本
                     const originalTextArea = document.createElement('textarea');
                     originalTextArea.value = processedText;
                     originalTextArea.style.display = 'none';
                     originalTextArea.className = 'hidden-original-text';
                     document.body.appendChild(originalTextArea);
-                    
+
                     // 顯示HTML表格
                     aiResultText.value = processedText; // 保持原始文本在textarea中用於複製
                     aiResultContainer.style.display = 'block';
-                    
+
                     // 創建表格容器
                     const tableContainer = document.createElement('div');
                     tableContainer.className = 'table-container';
-                    
+
                     // 添加搜索框
                     const searchContainer = document.createElement('div');
                     searchContainer.className = 'table-search-container';
@@ -386,25 +386,25 @@ document.addEventListener('DOMContentLoaded', function() {
                         <input type="text" id="table-search" placeholder="搜尋表格內容..." />
                         <button id="search-btn"><i class="fas fa-search"></i></button>
                     `;
-                    
+
                     // 將搜索框和表格添加到容器
                     tableContainer.appendChild(searchContainer);
                     tableContainer.insertAdjacentHTML('beforeend', tableHtml);
-                    
+
                     // 在textarea後面插入表格
                     aiResultText.parentNode.insertBefore(tableContainer, aiResultText.nextSibling);
-                    
+
                     // 添加搜索功能
                     setTimeout(() => {
                         const searchInput = document.getElementById('table-search');
                         const searchBtn = document.getElementById('search-btn');
                         const table = document.getElementById('sortable-table');
-                        
+
                         if (searchInput && searchBtn && table) {
                             const performSearch = () => {
                                 const searchTerm = searchInput.value.toLowerCase();
                                 const rows = table.querySelectorAll('tbody tr');
-                                
+
                                 rows.forEach(row => {
                                     const text = row.textContent.toLowerCase();
                                     if (text.includes(searchTerm)) {
@@ -414,7 +414,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                     }
                                 });
                             };
-                            
+
                             searchBtn.addEventListener('click', performSearch);
                             searchInput.addEventListener('keyup', (e) => {
                                 if (e.key === 'Enter') {
@@ -423,16 +423,16 @@ document.addEventListener('DOMContentLoaded', function() {
                             });
                         }
                     }, 100);
-                    
+
                     // 隱藏原始textarea
                     aiResultText.style.display = 'none';
-                    
+
                     // 添加表格說明
                     const tableInfo = document.createElement('div');
                     tableInfo.className = 'table-info';
                     tableInfo.innerHTML = '<p><i class="fas fa-info-circle"></i> 表格已格式化顯示，點擊「複製文字」按鈕可複製原始文本。支持表格排序和搜索功能。</p>';
                     tableContainer.parentNode.insertBefore(tableInfo, tableContainer);
-                    
+
                     // 添加表格標題（如果能從處理指令中推斷）
                     let tableTitle = '';
                     if (prompt.toLowerCase().includes('表格') || prompt.toLowerCase().includes('table')) {
@@ -441,14 +441,14 @@ document.addEventListener('DOMContentLoaded', function() {
                         for (let i = 0; i < promptWords.length; i++) {
                             if (promptWords[i].includes('表格') || promptWords[i].includes('table')) {
                                 // 獲取後面的詞作為可能的標題
-                                if (i + 1 < promptWords.length && promptWords[i+1].length > 1) {
-                                    tableTitle = promptWords[i+1];
+                                if (i + 1 < promptWords.length && promptWords[i + 1].length > 1) {
+                                    tableTitle = promptWords[i + 1];
                                     break;
                                 }
                             }
                         }
                     }
-                    
+
                     // 如果找到標題，添加到表格上方
                     if (tableTitle) {
                         const titleElement = document.createElement('div');
@@ -456,9 +456,9 @@ document.addEventListener('DOMContentLoaded', function() {
                         titleElement.textContent = tableTitle;
                         tableContainer.parentNode.insertBefore(titleElement, tableContainer);
                     }
-                    
+
                     // 修改複製按鈕的行為，使其複製原始文本
-                    aiCopyBtn.onclick = function() {
+                    aiCopyBtn.onclick = function () {
                         copyToClipboard(originalTextArea);
                     };
                 } else {
@@ -466,30 +466,30 @@ document.addEventListener('DOMContentLoaded', function() {
                     aiResultText.value = processedText;
                     aiResultText.style.display = 'block';
                     aiResultContainer.style.display = 'block';
-                    
+
                     // 恢復複製按鈕的原始行為
-                    aiCopyBtn.onclick = function() {
+                    aiCopyBtn.onclick = function () {
                         copyToClipboard(aiResultText);
                     };
                 }
-                
+
                 // 滾動到結果區域
                 aiResultContainer.scrollIntoView({ behavior: 'smooth' });
-                
+
                 showToast('處理完成');
             } else {
                 // 提供更詳細的錯誤信息
                 let errorMessage = '無法從API響應中提取處理結果';
                 let errorDetails = '';
                 let errorSolution = '';
-                
+
                 if (result.error) {
                     errorMessage = result.error.message;
                     // 檢查是否為API密鑰錯誤
                     if (errorMessage.includes('API key')) {
                         errorDetails = '您提供的API密鑰無效或已過期。';
                         errorSolution = '請檢查您的API密鑰是否正確，或者嘗試重新生成一個新的API密鑰。您可以在Google AI Studio網站上獲取新的API密鑰。';
-                    } 
+                    }
                     // 檢查是否為配額或限制錯誤
                     else if (errorMessage.includes('quota') || errorMessage.includes('limit')) {
                         errorDetails = '您已達到API使用限制或配額。';
@@ -522,18 +522,18 @@ document.addEventListener('DOMContentLoaded', function() {
                         errorSolution = '請檢查您的API密鑰權限，或嘗試重新生成一個新的API密鑰。';
                     }
                 }
-                
+
                 // 顯示錯誤信息
                 let fullErrorMessage = errorDetails ? `處理失敗: ${errorMessage}\n${errorDetails}` : `處理失敗: ${errorMessage}`;
                 showToast(fullErrorMessage, true);
                 console.error('API錯誤:', result);
-                
+
                 // 在結果區域顯示更詳細的錯誤信息和建議
                 let errorSolutionText = errorSolution || '請檢查您的網絡連接和API密鑰，然後重試。如果問題持續存在，請嘗試使用較短的文本或不同的處理指令。';
-                
+
                 // 格式化錯誤信息，使其更易於閱讀
                 aiResultText.value = `處理文字時發生錯誤:\n\n錯誤類型: ${errorMessage}\n\n可能的原因:\n${errorDetails || '未知錯誤，可能是API服務暫時不可用或請求格式不正確。'}\n\n解決方案:\n${errorSolutionText}\n\n如果問題持續存在，請嘗試:\n1. 重新整理頁面後再試\n2. 檢查API密鑰是否有效\n3. 減少文本長度或分段處理\n4. 使用不同的處理指令`;
-                
+
                 // 顯示結果區域並滾動到可見位置
                 aiResultContainer.style.display = 'block';
                 aiResultContainer.scrollIntoView({ behavior: 'smooth' });
@@ -541,12 +541,12 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch (error) {
             // 隱藏載入動畫
             loadingOverlay.style.display = 'none';
-            
+
             // 提供更詳細的錯誤信息
             let errorMessage = '處理過程中發生錯誤';
             let errorDetails = '';
             let errorSolution = '';
-            
+
             if (error.name === 'TypeError' && error.message.includes('fetch')) {
                 errorMessage = '網絡請求失敗';
                 errorDetails = '請檢查您的網絡連接是否正常。';
@@ -564,34 +564,34 @@ document.addEventListener('DOMContentLoaded', function() {
                 errorDetails = '處理過程被意外中斷。';
                 errorSolution = '請重新嘗試處理操作。';
             }
-            
+
             // 顯示錯誤信息
             let fullErrorMessage = errorDetails ? `${errorMessage}：${errorDetails}` : `${errorMessage}，請重試`;
             showToast(fullErrorMessage, true);
             console.error('AI處理錯誤:', error);
-            
+
             // 在結果區域顯示更詳細的錯誤信息和建議
             let errorSolutionText = errorSolution || '請檢查您的網絡連接和API密鑰，然後重試。如果問題持續存在，請嘗試使用較短的文本或不同的處理指令。';
-            
+
             // 格式化錯誤信息，使其更易於閱讀
             aiResultText.value = `處理文字時發生錯誤:\n\n錯誤類型: ${errorMessage}\n錯誤詳情: ${error.message}\n\n可能的原因:\n${errorDetails || '未知錯誤，可能是網絡問題或API服務暫時不可用。'}\n\n解決方案:\n${errorSolutionText}\n\n如果問題持續存在，請嘗試:\n1. 重新整理頁面後再試\n2. 檢查API密鑰是否有效\n3. 減少文本長度或分段處理\n4. 使用不同的瀏覽器`;
-            
+
             // 顯示結果區域並滾動到可見位置
             aiResultContainer.style.display = 'block';
             aiResultContainer.scrollIntoView({ behavior: 'smooth' });
         }
     }
-    
+
     // 判斷文本是否為表格格式
     function isTableFormat(text) {
         // 檢查是否包含多行且每行都有分隔符（如|、tab或多個空格）
         const lines = text.trim().split('\n');
         if (lines.length < 2) return false;
-        
+
         // 檢查是否有表格分隔符
         let delimiterCount = 0;
         let delimiterType = null;
-        
+
         // 檢查第一行的分隔符類型和數量
         if (lines[0].includes('|')) {
             delimiterType = '|';
@@ -603,7 +603,7 @@ document.addEventListener('DOMContentLoaded', function() {
             delimiterType = 'space';
             delimiterCount = (lines[0].match(/\s{2,}/g) || []).length;
         }
-        
+
         // 檢查是否有CSV格式（逗號分隔）
         if (!delimiterType && lines[0].includes(',')) {
             // 確認是否真的是CSV格式（至少有2個逗號且每行都有相似數量的逗號）
@@ -616,14 +616,14 @@ document.addEventListener('DOMContentLoaded', function() {
                         csvConsistentLines++;
                     }
                 }
-                
+
                 if (csvConsistentLines >= Math.min(lines.length, 10) * 0.7) {
                     delimiterType = ',';
                     delimiterCount = firstLineCommas;
                 }
             }
         }
-        
+
         // 如果沒有找到分隔符，則嘗試檢測其他表格特徵
         if (!delimiterType || delimiterCount === 0) {
             // 檢查是否有數字列表格式（如1. 項目1  2. 項目2）
@@ -636,11 +636,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
             if (numberListLines >= 3) return true; // 如果前5行中有3行以上符合數字列表格式，認為是表格
-            
+
             // 檢查是否有固定寬度的列（每行在相同位置有空格分隔）
             const columnPositions = detectFixedWidthColumns(lines);
             if (columnPositions.length >= 2) return true;
-            
+
             // 檢查是否有類似表格的結構（如每行都有相似的模式）
             const patterns = [];
             for (let i = 0; i < Math.min(lines.length, 10); i++) {
@@ -655,7 +655,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 patterns.push(pattern);
             }
-            
+
             // 檢查模式的相似度
             let similarPatterns = 0;
             const firstPattern = patterns[0];
@@ -666,9 +666,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     similarPatterns++;
                 }
             }
-            
+
             if (similarPatterns >= patterns.length * 0.6) return true;
-            
+
             // 檢查是否有表格關鍵詞
             const tableKeywords = ['表格', '表', 'table', '列表', 'list', '清單', '數據', 'data'];
             for (let i = 0; i < Math.min(5, lines.length); i++) {
@@ -678,23 +678,23 @@ document.addEventListener('DOMContentLoaded', function() {
                     return true;
                 }
             }
-            
+
             return false;
         }
-        
+
         // 檢查每行的分隔符數量是否一致（表格通常每行有相同數量的列）
         // 允許有一些行不一致（例如分隔線行）
         let consistentLines = 0;
         const totalLines = lines.length;
-        
+
         // 檢查是否有明顯的表格特徵（如標題行、分隔線等）
         let hasTableFeatures = false;
-        
+
         // 檢查是否有標題分隔行（通常是第二行，由 ----- 組成）
         if (lines.length > 1 && lines[1].replace(/[\-|+:\s]/g, '') === '') {
             hasTableFeatures = true;
         }
-        
+
         // 檢查是否有明顯的表頭（第一行與其他行格式不同）
         const firstLineWords = lines[0].split(/\s+/).filter(word => word.trim() !== '');
         if (firstLineWords.length >= 2 && firstLineWords.every(word => word.length > 0)) {
@@ -703,7 +703,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 hasTableFeatures = true;
             }
         }
-        
+
         // 檢查是否有行首數字序號（如1、2、3或①②③）
         const hasNumberPrefix = lines.slice(1, Math.min(6, lines.length)).every(line => {
             return /^\s*([0-9０-９①-⑳⑴-⑽一二三四五六七八九十]+)[、.．:：)）]/.test(line.trim());
@@ -711,12 +711,12 @@ document.addEventListener('DOMContentLoaded', function() {
         if (hasNumberPrefix && lines.length >= 3) {
             hasTableFeatures = true;
         }
-        
+
         for (let i = 0; i < totalLines; i++) {
             const line = lines[i].trim();
             // 跳過空行或分隔線行
             if (line === '' || line.replace(/[\-|+:\s]/g, '') === '') continue;
-            
+
             let currentCount = 0;
             if (delimiterType === '|') {
                 currentCount = (line.match(/\|/g) || []).length;
@@ -727,53 +727,53 @@ document.addEventListener('DOMContentLoaded', function() {
             } else if (delimiterType === ',') {
                 currentCount = (line.match(/,/g) || []).length;
             }
-            
+
             if (Math.abs(currentCount - delimiterCount) <= 1) { // 允許有1個分隔符的差異
                 consistentLines++;
             }
         }
-        
+
         // 如果至少60%的行符合表格格式，則認為是表格
         // 或者如果有明顯的表格特徵且至少50%的行符合表格格式
-        return (consistentLines / totalLines) >= 0.6 || 
-               (hasTableFeatures && (consistentLines / totalLines) >= 0.5);
+        return (consistentLines / totalLines) >= 0.6 ||
+            (hasTableFeatures && (consistentLines / totalLines) >= 0.5);
     }
-    
+
     // 計算兩個模式字符串的相似度
     function calculatePatternSimilarity(pattern1, pattern2) {
         const len1 = pattern1.length;
         const len2 = pattern2.length;
-        
+
         // 如果長度差異太大，直接返回低相似度
         if (Math.abs(len1 - len2) > Math.min(len1, len2) * 0.3) {
             return 0.5;
         }
-        
+
         // 計算共同字符的數量
         const minLen = Math.min(len1, len2);
         let commonChars = 0;
-        
+
         for (let i = 0; i < minLen; i++) {
             if (pattern1[i] === pattern2[i]) {
                 commonChars++;
             }
         }
-        
+
         return commonChars / minLen;
     }
-    
+
     // 檢測固定寬度列的函數
     function detectFixedWidthColumns(lines) {
         // 只分析前10行（或更少）
         const sampleLines = lines.slice(0, Math.min(10, lines.length));
-        
+
         // 找出每行中可能的列分隔位置（連續2個或更多空格的位置）
         const potentialPositions = [];
-        
+
         sampleLines.forEach(line => {
             let inSpace = false;
             let spaceStart = -1;
-            
+
             for (let i = 0; i < line.length; i++) {
                 if (line[i] === ' ') {
                     if (!inSpace) {
@@ -792,52 +792,52 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         });
-        
+
         // 計算每個位置出現的頻率
         const positionCounts = {};
         potentialPositions.forEach(pos => {
             // 允許1-2個字符的誤差
             const rangeStart = pos - 1;
             const rangeEnd = pos + 1;
-            
+
             for (let i = rangeStart; i <= rangeEnd; i++) {
                 positionCounts[i] = (positionCounts[i] || 0) + 1;
             }
         });
-        
+
         // 找出頻繁出現的位置（至少在30%的樣本行中出現）
         const threshold = sampleLines.length * 0.3;
         const columnPositions = [];
-        
+
         for (const pos in positionCounts) {
             if (positionCounts[pos] >= threshold) {
                 columnPositions.push(parseInt(pos));
             }
         }
-        
+
         // 排序位置
         columnPositions.sort((a, b) => a - b);
-        
+
         // 合併太接近的位置
         const mergedPositions = [];
         let lastPos = -999;
-        
+
         for (const pos of columnPositions) {
             if (pos - lastPos > 3) { // 如果與上一個位置相差超過3個字符
                 mergedPositions.push(pos);
                 lastPos = pos;
             }
         }
-        
+
         return mergedPositions;
     }
-    
+
     // 將文本轉換為HTML表格
     function convertToHtmlTable(text) {
         const lines = text.trim().split('\n');
         let delimiter = '|';
         let delimiterType = 'pipe';
-        
+
         // 確定分隔符類型
         if (!lines[0].includes('|')) {
             if (lines[0].includes('\t')) {
@@ -863,24 +863,24 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         }
-        
+
         // 處理表格數據
         const tableData = [];
         let hasHeaderSeparator = false;
-        
+
         // 檢查是否有標題分隔行（通常是第二行，由 ----- 組成）
         if (lines.length > 1 && lines[1].replace(/[\-|+:\s]/g, '') === '') {
             hasHeaderSeparator = true;
         }
-        
+
         // 檢查是否為數字列表格式（如1. 項目1  2. 項目2）
         const isNumberedList = lines.length > 2 && lines.slice(0, Math.min(5, lines.length)).every(line => /^\s*\d+[\.):]\s+.+$/.test(line));
-        
+
         // 解析每一行
         for (let i = 0; i < lines.length; i++) {
             // 跳過分隔行
             if (lines[i].replace(/[\-|+:\s]/g, '') === '') continue;
-            
+
             let cells;
             if (isNumberedList) {
                 // 處理數字列表格式
@@ -903,10 +903,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 cells = [];
                 let inQuotes = false;
                 let currentCell = '';
-                
+
                 for (let j = 0; j < lines[i].length; j++) {
                     const char = lines[i][j];
-                    
+
                     if (char === '"') {
                         // 切換引號狀態
                         inQuotes = !inQuotes;
@@ -919,7 +919,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         currentCell += char;
                     }
                 }
-                
+
                 // 添加最後一個單元格
                 cells.push(currentCell.trim());
             } else if (delimiterType === 'fixed-width') {
@@ -927,7 +927,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const columnPositions = detectFixedWidthColumns(lines);
                 cells = [];
                 let lastPos = 0;
-                
+
                 // 根據列位置分割行
                 for (let j = 0; j < columnPositions.length; j++) {
                     const pos = columnPositions[j];
@@ -935,21 +935,21 @@ document.addEventListener('DOMContentLoaded', function() {
                     cells.push(cellContent);
                     lastPos = pos;
                 }
-                
+
                 // 添加最後一列
                 const lastCellContent = lines[i].substring(lastPos).trim();
                 if (lastCellContent) cells.push(lastCellContent);
-                
+
                 // 過濾空單元格
                 cells = cells.filter(cell => cell !== '');
             } else {
                 // 處理空格分隔的表格
                 cells = lines[i].split(/\s{2,}/).map(cell => cell.trim()).filter(cell => cell !== '');
             }
-            
+
             tableData.push(cells);
         }
-        
+
         // 確保所有行有相同數量的列
         const maxColumns = Math.max(...tableData.map(row => row.length));
         tableData.forEach(row => {
@@ -957,10 +957,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 row.push('');
             }
         });
-        
+
         // 構建HTML表格
         let tableHtml = '<table class="styled-table" id="sortable-table">';
-        
+
         // 添加表頭
         tableHtml += '<thead><tr>';
         const headerRow = tableData[0];
@@ -971,7 +971,7 @@ document.addEventListener('DOMContentLoaded', function() {
             tableHtml += `<th style="text-align: ${alignment};">${cell}</th>`;
         });
         tableHtml += '</tr></thead>';
-        
+
         // 添加表格內容
         tableHtml += '<tbody>';
         // 表格內容從 tableData 的索引 1 開始 (索引 0 是表頭)
@@ -992,7 +992,7 @@ document.addEventListener('DOMContentLoaded', function() {
             tableHtml += '</tr>';
         }
         tableHtml += '</tbody></table>';
-        
+
         // 添加表格樣式
         let tableStyle = `
         <style>
@@ -1293,7 +1293,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         </style>
         `;
-        
+
         // 添加表格排序功能的JavaScript代碼
         const sortScript = `
         <script>
@@ -1380,7 +1380,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         </script>
         `;
-        
+
         // 添加排序圖標樣式
         tableStyle += `
         <style>
@@ -1400,16 +1400,16 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         </style>
         `;
-        
+
         return tableStyle + tableHtml + sortScript;
     }
-    
+
     // 檢查整列是否為數字類型（用於設置列的對齊方式）
     function isColumnNumeric(tableData, columnIndex) {
         // 跳過表頭行
         let numericCount = 0;
         let totalValidCells = 0;
-        
+
         // 從第二行開始檢查
         for (let i = 1; i < tableData.length; i++) {
             if (tableData[i].length > columnIndex) {
@@ -1423,14 +1423,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         }
-        
+
         // 如果沒有有效單元格，返回false
         if (totalValidCells === 0) return false;
-        
+
         // 如果超過65%的有效單元格是數字，則認為整列是數字類型
         return numericCount >= totalValidCells * 0.65;
     }
-    
+
     // 重置UI
     function resetUI() {
         uploadArea.style.display = 'block';
